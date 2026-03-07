@@ -1,0 +1,26 @@
+name = "nexus-gateway"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[[durable_objects.bindings]]
+name = "MCP_OBJECT"
+class_name = "NexusGateway"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["NexusGateway"]
+
+[vars]
+# Add your backend URLs here
+# SPOTIFY_URL = "https://your-spotify-mcp.workers.dev"
+# MEMORY_URL = "https://your-memory-mcp.workers.dev"
+# DISCORD_URL = "https://your-discord-mcp.workers.dev"
+# TELEGRAM_URL = "https://your-telegram-mcp.workers.dev"
+# BIOMETRICS_URL = "https://your-biometrics-mcp.workers.dev"
+
+# Secrets (set via wrangler secret put):
+# - MCP_API_KEY
