@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="banner.png" alt="Nexus Gateway" width="100%" />
+  <img src="banner.jpg" alt="Nexus Gateway" width="100%" />
 </p>
 
 <p align="center">
