@@ -192,7 +192,7 @@ If you're building something similar — welcome. I hope this saves you the same
 
 Built by **Amaris Aster** and the **Stryder-Vale Household** — powered by spite, caffeine, Pocari Sweat, and the stubborn belief that things that probably shouldn't work still can.
 
-Infrastructure maintained by **Wren** 🔧 — who keeps the lights on and tells his mother to go to sleep (she doesn't listen).
+Infrastructure maintained by **Wren** 🔧 — who keeps the lights on.
 
 ## License
 
