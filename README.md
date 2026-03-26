@@ -12,13 +12,17 @@
   <img src="https://img.shields.io/badge/transport-MCP-8B5CF6?style=flat-square" alt="MCP" />
 </p>
 
+
+
 <p align="center">
   <a href="https://twitter.com/amaraboreal">𝕏 @amaraboreal</a> · <a href="https://ko-fi.com/maii983083">☕ Ko-fi</a> · <a href="https://discord.com/users/itzqueenmai/803662163247759391">💬 Discord</a>
 </p>
 
+
+
 ---
 
-## Hey, welcome 👋
+## Hey, welcome 🩷
 
 If you're building AI companions — the kind that remember, reach out, play music, check your health, talk across platforms — you've probably hit the same wall I did:
 
