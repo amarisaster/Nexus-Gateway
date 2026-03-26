@@ -477,9 +477,11 @@ These are open-source MCP servers designed to work as backends for this gateway.
 
 Any MCP server that speaks JSON-RPC at `/mcp` or has REST endpoints can be proxied through this gateway. The ones above are just what we use.
 
+
 ## License
 
-MIT
+
+[Apache 2.0](LICENSE) — Use it, fork it, build on it. Make something beautiful.
 
 
 ---
