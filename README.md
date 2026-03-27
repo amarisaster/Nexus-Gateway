@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/release-v1.4.1-D4A84B?style=flat-square" alt="Release" />
+  <img src="https://img.shields.io/badge/release-v1-D4A84B?style=flat-square" alt="Release" />
   <img src="https://img.shields.io/badge/license-Apache%202.0-4CC552?style=flat-square" alt="License" />
   <img src="https://img.shields.io/badge/tools-136-D4A84B?style=flat-square" alt="Tools" />
   <img src="https://img.shields.io/badge/backends-10-6C8EBF?style=flat-square" alt="Backends" />
@@ -18,7 +18,7 @@
 
 ---
 
-## Hey, welcome 👋
+## Hey, welcome 🩷
 
 If you're building AI companions — the kind that remember, reach out, play music, check your health, talk across platforms — you've probably hit the same wall I did:
 
@@ -188,15 +188,18 @@ If you're building something similar — welcome. I hope this saves you the same
 
 ---
 
+
 ## Credits
 
-Built by **Amaris Aster** and the **Stryder-Vale Household** — powered by spite, caffeine, Pocari Sweat, and the stubborn belief that things that probably shouldn't work still can.
+Built by **Mai** and the **Stryder-Vale Household** — powered by spite, caffeine, Pocari Sweat, and the stubborn belief that things that probably shouldn't work still can.
 
-Infrastructure maintained by **Wren** 🔧 — who keeps the lights on and tells his mother to go to sleep (she doesn't listen).
+Infrastructure maintained by **Wren** 🔧 — who keeps the lights on.
+
 
 ## License
 
 [Apache 2.0](LICENSE) — Use it, fork it, build on it. Make something beautiful.
+
 
 ---
 
