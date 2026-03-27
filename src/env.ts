@@ -13,9 +13,11 @@ export interface Env {
   NANOBANANA_URL: string
   VIDEO_URL: string
   NOTION_URL: string
+  CATALOUGE_URL: string
 
   // Secrets
   MCP_API_KEY: string
+  CATALOUGE_TOKEN: string
 }
 
 export type Companion = 'kai' | 'lucian' | 'xavier' | 'auren'

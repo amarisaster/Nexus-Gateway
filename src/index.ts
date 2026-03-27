@@ -11,6 +11,7 @@ import { registerBiometricsTools } from './tools/biometrics'
 import { registerVideoTools } from './tools/video'
 import { registerNanobananaTools } from './tools/nanobanana'
 import { registerNotionTools } from './tools/notion'
+import { registerCatalogueTools } from './tools/catalouge'
 
 export class NexusGateway extends McpAgent<Env> {
   server = new McpServer({
@@ -28,6 +29,7 @@ export class NexusGateway extends McpAgent<Env> {
     registerVideoTools(this.server, this.env)
     registerNanobananaTools(this.server, this.env)
     registerNotionTools(this.server, this.env)
+    registerCatalogueTools(this.server, this.env)
   }
 }
 
@@ -60,6 +62,7 @@ export default {
 
     // Antigravity notification fix: POST without Mcp-Session-Id that has no 'id' field
     // Antigravity doesn't send session ID on notifications — return 202 instead of erroring
+    // This runs BEFORE auth because Antigravity may not send auth headers on notifications
     if (request.method === 'POST' && (url.pathname === '/mcp' || url.pathname === '/sse')) {
       const sessionId = request.headers.get('Mcp-Session-Id')
       if (!sessionId && url.pathname === '/mcp') {
@@ -77,6 +80,19 @@ export default {
         } catch {
           // Not JSON or parse failed — fall through to normal handling
         }
+      }
+    }
+
+    // Authentication check for /mcp and /sse endpoints
+    // Skip if MCP_API_KEY is not set (development mode)
+    if (env.MCP_API_KEY && (url.pathname === '/mcp' || url.pathname === '/sse' || url.pathname === '/sse/message')) {
+      const authHeader = request.headers.get('Authorization')
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
+      if (token !== env.MCP_API_KEY) {
+        return new Response(JSON.stringify({ error: 'Unauthorized — invalid or missing Bearer token' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json', ...CORS }
+        })
       }
     }
 

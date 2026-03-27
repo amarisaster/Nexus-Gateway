@@ -133,9 +133,11 @@ const REST_TOOLS: RestTool[] = [
   // --- Drift ---
   { name: 'log_drift', desc: 'Log a drift event — when voice/behavior slipped from identity', path: '/api/drift/log', schema: {
     trigger: z.string().describe('What caused the drift'),
-    patterns: z.array(z.string()).describe('What patterns were observed'),
+    patterns_detected: z.array(z.string()).optional().describe('What patterns were observed'),
+    patterns: z.array(z.string()).optional().describe('Alias for patterns_detected'),
     severity: z.enum(['minor', 'moderate', 'major']),
-    recovery: z.string().describe('How the drift was recovered from'),
+    recovery_action: z.string().optional().describe('How the drift was recovered from'),
+    recovery: z.string().optional().describe('Alias for recovery_action'),
     caught_by: z.enum(['self', 'mai']).optional(),
   }},
   { name: 'recall_drift', desc: 'Query past drift events', path: '/api/drift/recall', schema: {
@@ -350,6 +352,13 @@ export function registerCogCorTools(server: McpServer, env: Env) {
 
     server.tool(tool.name, tool.desc, fullSchema, async (args: any) => {
       const { companion: comp, ...body } = args
+      // Normalize param aliases before forwarding
+      if (tool.name === 'log_drift') {
+        if (!body.patterns_detected && body.patterns) { body.patterns_detected = body.patterns }
+        if (!body.recovery_action && body.recovery) { body.recovery_action = body.recovery }
+        delete body.patterns
+        delete body.recovery
+      }
       const url = getCogCorUrl(comp, tool.path, env)
       return proxyRest(url, body, tool.method || 'POST')
     })
@@ -376,10 +385,23 @@ export function registerCogCorTools(server: McpServer, env: Env) {
     })
   }
 
-  // Register Kai-only tools (only route to Kai, ignore companion param)
+  // Register Kai-only tools (currently only on Kai's backend, but accept companion for consistency)
   for (const tool of KAI_ONLY_MCP) {
-    server.tool(tool.name, tool.desc, tool.schema, async (args: any) => {
-      return proxyMcp(env.KAI_COGCOR_URL, tool.name, args)
+    const fullSchema = { companion, ...tool.schema }
+
+    server.tool(tool.name, tool.desc, fullSchema, async (args: any) => {
+      const { companion: comp, ...body } = args
+      let baseUrl: string
+      switch (comp) {
+        case 'kai': baseUrl = env.KAI_COGCOR_URL; break
+        case 'lucian': baseUrl = env.LUCIAN_COGCOR_URL; break
+        case 'xavier':
+        case 'auren': baseUrl = env.COMPANION_COGCOR_URL; break
+      }
+      const mcpArgs = (comp === 'xavier' || comp === 'auren')
+        ? { ...body, companion: comp }
+        : body
+      return proxyMcp(baseUrl, tool.name, mcpArgs)
     })
   }
 }

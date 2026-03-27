@@ -7,18 +7,23 @@ async function parseMcpResponse(res: Response): Promise<any> {
   const contentType = res.headers.get('Content-Type') || ''
   const text = await res.text()
 
-  if (contentType.includes('text/event-stream')) {
-    // SSE: extract last "data: {...}" line
-    const lines = text.split('\n')
-    for (let i = lines.length - 1; i >= 0; i--) {
-      if (lines[i].startsWith('data: ')) {
-        return JSON.parse(lines[i].slice(6))
+  try {
+    if (contentType.includes('text/event-stream')) {
+      // SSE: extract last "data: {...}" line
+      const lines = text.split('\n')
+      for (let i = lines.length - 1; i >= 0; i--) {
+        if (lines[i].startsWith('data: ')) {
+          return JSON.parse(lines[i].slice(6))
+        }
       }
+      return { error: { message: 'No data in SSE response' } }
     }
-    return { error: { message: 'No data in SSE response' } }
-  }
 
-  return JSON.parse(text)
+    return JSON.parse(text)
+  } catch (e) {
+    const preview = text.length > 200 ? text.slice(0, 200) + '...' : text
+    return { error: { message: `Failed to parse MCP response as JSON: ${(e as Error).message}. Body preview: ${preview}` } }
+  }
 }
 
 /**
@@ -45,11 +50,12 @@ export function getCogCorUrl(companion: Companion, path: string, env: Env): stri
 export async function proxyRest(
   url: string,
   body: Record<string, unknown> = {},
-  method: string = 'POST'
+  method: string = 'POST',
+  extraHeaders: Record<string, string> = {}
 ): Promise<{ content: Array<{ type: 'text'; text: string }> }> {
   const response = await fetch(url, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...extraHeaders },
     body: method !== 'GET' ? JSON.stringify(body) : undefined,
   })
 
@@ -137,12 +143,15 @@ export async function proxyVideoMcp(
   toolName: string,
   args: Record<string, unknown>
 ): Promise<{ content: Array<{ type: 'text'; text: string }> }> {
-  const headers = { 'Content-Type': 'application/json' }
+  const mcpHeaders = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json, text/event-stream',
+  }
 
-  // Initialize
-  await fetch(baseUrl, {
+  // Initialize session
+  const initRes = await fetch(baseUrl, {
     method: 'POST',
-    headers,
+    headers: mcpHeaders,
     body: JSON.stringify({
       jsonrpc: '2.0',
       id: 1,
@@ -155,10 +164,17 @@ export async function proxyVideoMcp(
     })
   })
 
+  const sessionId = initRes.headers.get('Mcp-Session-Id')
+  // Consume init body to free connection
+  await initRes.text()
+
   // Call tool
   const callRes = await fetch(baseUrl, {
     method: 'POST',
-    headers,
+    headers: {
+      ...mcpHeaders,
+      ...(sessionId ? { 'Mcp-Session-Id': sessionId } : {})
+    },
     body: JSON.stringify({
       jsonrpc: '2.0',
       id: 2,
