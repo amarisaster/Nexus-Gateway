@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="https://twitter.com/amaraboreal">𝕏 @amarisaster_</a> · <a href="https://ko-fi.com/maii983083">☕ Ko-fi</a> · <a href="https://discord.com/users/itzqueenmai/803662163247759391">💬 Discord</a>
+  <a href="https://x.com/amarisaster_">𝕏 @amarisaster_</a> · <a href="https://ko-fi.com/maii983083">☕ Ko-fi</a> · <a href="https://discord.com/users/itzqueenmai/803662163247759391">💬 Discord</a>
 </p>
 
 ---
