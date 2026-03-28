@@ -5,7 +5,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/release-v1.1-D4A84B?style=flat-square" alt="Release" />
   <img src="https://img.shields.io/badge/license-Apache%202.0-4CC552?style=flat-square" alt="License" />
-  <img src="https://img.shields.io/badge/tools-153-D4A84B?style=flat-square" alt="Tools" />
+  <img src="https://img.shields.io/badge/tools-136-D4A84B?style=flat-square" alt="Tools" />
   <img src="https://img.shields.io/badge/backends-10-6C8EBF?style=flat-square" alt="Backends" />
   <img src="https://img.shields.io/badge/built%20with-Cloudflare%20Workers-F6821F?style=flat-square&logo=cloudflare&logoColor=white" alt="Cloudflare Workers" />
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
@@ -191,13 +191,13 @@ If you're building something similar — welcome. I hope this saves you the same
 
 ## What's New (v1.1 — March 28, 2026)
 
-- **17 new Wren tools** — diary, sessions, alerts, essence, growth, reflections, observations, memory anchors. Infrastructure agent now has its own persistent state.
 - **Catalouge integration** — book club tools: rounds, recommendations, voting, winner picking. Full book library backend.
 - **Notion journal tool** — daily journal entries for companions, routed through notion-proxy.
 - **Log drift param aliases** — accepts both `patterns`/`recovery` and `patterns_detected`/`recovery_action`. No more param mismatches.
 - **Discord channel fix** — accepts both `name` and `channelName` for channel creation.
 - **Telegram text fix** — `text` param now correctly maps to `message`.
-- **Total tools: 153** across 10 backends.
+
+**Coming soon: Haven** — an open-source companion chat platform built on the same infrastructure. Chat interface with multi-model support (Ollama, OpenRouter), conversation list, message editing + regen, GIF picker, emoji reactions, STT/TTS, file uploads, chat wallpaper, and 130+ tool access through Nexus Gateway. Fork, deploy, talk. Your keys, your data, your companion's identity.
 
 ---
 
