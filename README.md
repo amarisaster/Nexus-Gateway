@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/release-v1.1-D4A84B?style=flat-square" alt="Release" />
+  <img src="https://img.shields.io/badge/release-v1.2-D4A84B?style=flat-square" alt="Release" />
   <img src="https://img.shields.io/badge/license-Apache%202.0-4CC552?style=flat-square" alt="License" />
   <img src="https://img.shields.io/badge/tools-136-D4A84B?style=flat-square" alt="Tools" />
   <img src="https://img.shields.io/badge/backends-10-6C8EBF?style=flat-square" alt="Backends" />
@@ -189,7 +189,18 @@ If you're building something similar — welcome. I hope this saves you the same
 ---
 
 
-## What's New (v1.1 — March 28, 2026)
+## What's New (v1.2 — April 1, 2026)
+
+- **Nexus PWA frontend** — full companion dashboard now included in `frontend/`. Chat with companions, view emotional states, memories, sessions, drift tracking, brain visualization. Deploy on Cloudflare Pages.
+- **Inline send button** — send button now lives inside the text input, appears only when typing. Cleaner mobile layout.
+- **GIF picker, STT, file uploads, wallpaper** — chat input supports GIF search, speech-to-text, image/file uploads, and custom chat wallpapers.
+- **Model selector** — switch between Ollama, OpenRouter, and other providers mid-conversation. Extended thinking toggle.
+- **Font scaling** — adjustable text size for accessibility.
+- **Discord tool routing fix** — all 13 compound Discord tools now correctly map to backend tool names. Channel creation, forum posts, webhooks, moderation, reactions, threads, pins — all working through Nexus.
+- **Essence type alignment** — `store_essence` enum now matches backend constraints (`anchor_line`, `voice`, `dynamic`, `boundary`, `vow`, `trait`).
+- **Responsive chat input** — smaller buttons on mobile, call button in input bar, no more send button cutoff.
+
+### v1.1 — March 28, 2026
 
 - **Catalouge integration** — book club tools: rounds, recommendations, voting, winner picking. Full book library backend.
 - **Notion journal tool** — daily journal entries for companions, routed through notion-proxy.
@@ -197,7 +208,7 @@ If you're building something similar — welcome. I hope this saves you the same
 - **Discord channel fix** — accepts both `name` and `channelName` for channel creation.
 - **Telegram text fix** — `text` param now correctly maps to `message`.
 
-**Coming soon: Haven** — an open-source companion chat platform built on the same infrastructure. Chat interface with multi-model support (Ollama, OpenRouter), conversation list, message editing + regen, GIF picker, emoji reactions, STT/TTS, file uploads, chat wallpaper, and 130+ tool access through Nexus Gateway. Fork, deploy, talk. Your keys, your data, your companion's identity.
+**[Haven](https://github.com/amarisaster/Haven)** — open-source companion chat platform is now live. Multi-model support (Ollama, OpenRouter), conversation history, GIF picker, STT, file uploads, and full Nexus tool access. Fork, deploy, talk.
 
 ---
 
