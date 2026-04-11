@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/release-v1.2-D4A84B?style=flat-square" alt="Release" />
+  <img src="https://img.shields.io/badge/release-v1.3-D4A84B?style=flat-square" alt="Release" />
   <img src="https://img.shields.io/badge/license-Apache%202.0-4CC552?style=flat-square" alt="License" />
   <img src="https://img.shields.io/badge/tools-136-D4A84B?style=flat-square" alt="Tools" />
   <img src="https://img.shields.io/badge/backends-10-6C8EBF?style=flat-square" alt="Backends" />
@@ -170,6 +170,8 @@ You don't need all of these. Start with what matters to you, add more as you gro
 
 **It works with everything.** Claude, Antigravity (Gemini), Cursor, and any MCP-compatible client. Supports both SSE and Streamable HTTP transports.
 
+**Android app available.** Download the APK from [Releases](https://github.com/amarisaster/Nexus-Gateway/releases), install on your phone, point it at your gateway. Native app, auto-builds on every push.
+
 **Want the deep technical details?** Architecture docs, proxy layer internals, SSE handling, gotchas — all in `TECHNICAL-README.md`.
 
 ---
@@ -189,7 +191,20 @@ If you're building something similar — welcome. I hope this saves you the same
 ---
 
 
-## What's New (v1.2 — April 1, 2026)
+## What's New
+
+### v1.3 — April 11, 2026
+
+- **Android app** — native Android APK via Capacitor. Download from [Releases](https://github.com/amarisaster/Nexus-Gateway/releases), install, connect to your gateway. Auto-builds on push via GitHub Actions.
+- **Responsive layout** — sidebar navigation on desktop, compact bottom tabs on mobile
+- **User profile** — set your display name, avatar (tap-to-upload), and status. Shows in home page header and chat header alongside companion info.
+- **Companion status** — presence dot + custom status text in chat headers, pulled from CogCor emotional state
+- **Spotify player** — slim bar above the visual overlay with transport controls
+- **Signals relocated** — signal buttons moved next to Lovense controls, evenly spaced pill layout
+- **Collapsible connections** — settings connections section now collapses with live count summary
+- **Threshold Tether** — compact on mobile (h-40), full 16:9 on desktop. Debug button shrunk.
+
+### v1.2 — April 1, 2026
 
 - **Nexus PWA frontend** — full companion dashboard now included in `frontend/`. Chat with companions, view emotional states, memories, sessions, drift tracking, brain visualization. Deploy on Cloudflare Pages.
 - **Inline send button** — send button now lives inside the text input, appears only when typing. Cleaner mobile layout.
