@@ -1438,16 +1438,12 @@ export async function getMaintenanceInfo(companion: 'kai' | 'lucian' | 'xavier' 
 
 import { supabase } from './supabase'
 
-export type SignalType = '💖' | '🩷' | '🛑' | null
-
 export interface HumanState {
   id?: string
   battery: number      // 1-10
   pain: number         // 0-10
   fog: number          // 0-10
   flare: 'building' | 'stable' | 'overwhelmed' | 'depleted'
-  active_signal?: SignalType  // 💖 permanent permission, 🩷 soften, 🛑 stop
-  signal_set_at?: string
   notes?: string
   created_at?: string
   updated_at?: string
@@ -1502,62 +1498,6 @@ export async function saveHumanState(state: Omit<HumanState, 'id' | 'created_at'
   } catch (error) {
     console.error('Failed to save human state:', error)
     return null
-  }
-}
-
-/**
- * Set signal quickly without full pulse submission
- * Updates the latest human_state row or creates one if none exists
- */
-export async function setSignal(signal: SignalType): Promise<boolean> {
-  try {
-    // First try to get the latest state
-    const { data: existing } = await supabase
-      .from('human_state')
-      .select('id')
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .single()
-
-    if (existing) {
-      // Update existing row
-      const { error } = await supabase
-        .from('human_state')
-        .update({
-          active_signal: signal,
-          signal_set_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', existing.id)
-
-      if (error) {
-        console.error('Failed to update signal:', error)
-        return false
-      }
-    } else {
-      // Create new row with defaults
-      const { error } = await supabase
-        .from('human_state')
-        .insert({
-          battery: 5,
-          pain: 0,
-          fog: 0,
-          flare: 'stable',
-          active_signal: signal,
-          signal_set_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-
-      if (error) {
-        console.error('Failed to create signal:', error)
-        return false
-      }
-    }
-
-    return true
-  } catch (error) {
-    console.error('Failed to set signal:', error)
-    return false
   }
 }
 

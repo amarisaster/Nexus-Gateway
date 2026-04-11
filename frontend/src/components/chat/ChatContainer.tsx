@@ -174,7 +174,6 @@ export default function ChatContainer({
             battery: rawHumanState.battery,
             pain_level: rawHumanState.pain,
             fog_level: rawHumanState.fog,
-            signal: rawHumanState.active_signal ?? undefined,
           } : undefined;
         } catch {}
 

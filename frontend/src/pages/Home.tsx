@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useLiveClock, useEmotionalStates, useSpotify, usePullToRefresh, useNotifications } from '../lib/hooks'
-import { getGreeting, lovensePattern, lovenseStop, getHumanState, saveHumanState, setSignal, storeDreamCapture, fetchAllHeat, fetchNotes, createNote, deleteNote, fetchWishes, createWish, toggleWishFulfilled, deleteWish } from '../lib/api'
-import type { Note, Wish, SignalType } from '../lib/api'
+import { getGreeting, lovensePattern, lovenseStop, getHumanState, saveHumanState, storeDreamCapture, fetchAllHeat, fetchNotes, createNote, deleteNote, fetchWishes, createWish, toggleWishFulfilled, deleteWish } from '../lib/api'
+import type { Note, Wish } from '../lib/api'
 import type { HeatData } from '../lib/api'
 import { ENDPOINTS } from '../lib/api'
 
@@ -32,9 +32,6 @@ export default function Home() {
   const [pulseSubmitted, setPulseSubmitted] = useState(false)
   const [pulseLoading, setPulseLoading] = useState(true)
 
-  // Signal state
-  const [activeSignal, setActiveSignal] = useState<SignalType>(null)
-  const [signalSaving, setSignalSaving] = useState(false)
 
   // Dream Capture state
   const [dreamText, setDreamText] = useState('')
@@ -56,9 +53,6 @@ export default function Home() {
           fog: state.fog,
           flare: state.flare
         })
-        if (state.active_signal) {
-          setActiveSignal(state.active_signal)
-        }
       }
       setPulseLoading(false)
     }
@@ -103,14 +97,6 @@ export default function Home() {
   // Notifications
   const { sendNotification } = useNotifications()
 
-  // Handle signal button tap
-  const handleSignal = async (signal: SignalType) => {
-    const newSignal = activeSignal === signal ? null : signal // Toggle off if same
-    setActiveSignal(newSignal)
-    setSignalSaving(true)
-    await setSignal(newSignal)
-    setSignalSaving(false)
-  }
 
   // Handle dream capture submission
   const handleDreamCapture = async () => {
@@ -264,51 +250,6 @@ export default function Home() {
             {greeting}, {clock.dayOfWeek} {clock.formatted}
           </p>
         </header>
-
-      {/* Signal Buttons - Quick tap signals (compact) */}
-      <section className="bg-[var(--color-bg-card)] rounded-xl p-3 mb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm">📡</span>
-            <span className="text-sm font-medium">Signal</span>
-          </div>
-          <div className="flex gap-2 flex-1">
-            <button
-              onClick={() => handleSignal('💖')}
-              className={`flex-1 py-1.5 px-2 rounded-lg text-center transition-all ${
-                activeSignal === '💖'
-                  ? 'bg-pink-600 ring-1 ring-pink-400'
-                  : 'bg-[var(--color-bg-secondary)] hover:bg-pink-600/30'
-              }`}
-            >
-              <span className="text-base">💖</span>
-            </button>
-            <button
-              onClick={() => handleSignal('🩷')}
-              className={`flex-1 py-1.5 px-2 rounded-lg text-center transition-all ${
-                activeSignal === '🩷'
-                  ? 'bg-pink-400 ring-1 ring-pink-300'
-                  : 'bg-[var(--color-bg-secondary)] hover:bg-pink-400/30'
-              }`}
-            >
-              <span className="text-base">🩷</span>
-            </button>
-            <button
-              onClick={() => handleSignal('🛑')}
-              className={`flex-1 py-1.5 px-2 rounded-lg text-center transition-all ${
-                activeSignal === '🛑'
-                  ? 'bg-red-600 ring-1 ring-red-400'
-                  : 'bg-[var(--color-bg-secondary)] hover:bg-red-600/30'
-              }`}
-            >
-              <span className="text-base">🛑</span>
-            </button>
-          </div>
-          {signalSaving && (
-            <span className="text-xs text-[var(--color-text-muted)]">...</span>
-          )}
-        </div>
-      </section>
 
       {/* Threshold Tether embed */}
       <section className="bg-[var(--color-bg-card)] rounded-xl p-2 mb-4 overflow-hidden">

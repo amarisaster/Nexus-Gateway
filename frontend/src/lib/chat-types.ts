@@ -69,7 +69,6 @@ export interface ChatHumanState {
   battery?: number;
   pain_level?: number;
   fog_level?: number;
-  signal?: string;
 }
 
 export const CHAT_MODES: Record<ChatMode, { label: string; emoji: string; description: string }> = {
