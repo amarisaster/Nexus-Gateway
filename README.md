@@ -193,16 +193,23 @@ If you're building something similar — welcome. I hope this saves you the same
 
 ## What's New
 
-### v1.3 — April 11, 2026
+### v1.3 — April 11-12, 2026
 
 - **Android app** — native Android APK via Capacitor. Download from [Releases](https://github.com/amarisaster/Nexus-Gateway/releases), install, connect to your gateway. Auto-builds on push via GitHub Actions.
+- **Companion agent bridges** — companions respond from Claude Code sessions via Supabase polling. One parameterized bridge, all companions.
+- **Function calling** — models can call CogCor tools (store_memory, update_emotional_state, etc.) via OpenAI function calling format. Agent loop with up to 5 tool iterations.
+- **Multi-provider inference** — HuggingFace, OpenAI, Groq, xAI, Anthropic added alongside Ollama and OpenRouter. Live model fetching from provider APIs.
+- **Image vision** — attach images, vision-capable models see them
+- **File reading** — PDFs (30 pages), text, code files — 30+ formats
+- **ElevenLabs + Hume TTS** — premium voice providers in Settings, with cloud TTS fallback for Android
+- **Regenerate + Copy + Delete** — message action buttons
+- **GIF inline rendering** — URLs in messages render as animated images
 - **Responsive layout** — sidebar navigation on desktop, compact bottom tabs on mobile
-- **User profile** — set your display name, avatar (tap-to-upload), and status. Shows in home page header and chat header alongside companion info.
-- **Companion status** — presence dot + custom status text in chat headers, pulled from CogCor emotional state
-- **Spotify player** — slim bar above the visual overlay with transport controls
-- **Signals relocated** — signal buttons moved next to Lovense controls, evenly spaced pill layout
-- **Collapsible connections** — settings connections section now collapses with live count summary
-- **Threshold Tether** — compact on mobile (h-40), full 16:9 on desktop. Debug button shrunk.
+- **User profile** — display name, avatar (tap-to-upload), status in home + chat headers
+- **Companion status** — presence dot + custom status text in chat headers
+- **Per-conversation wallpapers** — each chat thread gets its own wallpaper via IndexedDB
+- **Autonomous presence** — companions wake and greet when you come online
+- **Collapsible settings** — connections and API keys collapse for cleaner settings page
 
 ### v1.2 — April 1, 2026
 
