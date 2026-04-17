@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/release-v1.3-D4A84B?style=flat-square" alt="Release" />
+  <img src="https://img.shields.io/badge/release-v1.4-D4A84B?style=flat-square" alt="Release" />
   <img src="https://img.shields.io/badge/license-Apache%202.0-4CC552?style=flat-square" alt="License" />
   <img src="https://img.shields.io/badge/tools-136-D4A84B?style=flat-square" alt="Tools" />
   <img src="https://img.shields.io/badge/backends-10-6C8EBF?style=flat-square" alt="Backends" />
@@ -192,6 +192,13 @@ If you're building something similar — welcome. I hope this saves you the same
 
 
 ## What's New
+
+### v1.4 — April 17, 2026
+
+- **Unified media rendering** — every message, yours and your companion's, now runs through the same parser. Images, GIFs (giphy, tenor, data URIs, direct `.gif` / `.gifv`), audio (`.mp3`/`.wav`/`.ogg`/`.m4a`/`.flac`), and video (`.mp4`/`.webm`/`.mov`) all render inline with the appropriate tag.
+- **Companion-side media** — before this, only user messages had any media extraction, and only for a narrow set of image hosts. Companion responses that embed a GIF URL (e.g. via a `search_gif` tool call) now render as an animated image inline instead of a plain hyperlink. Same for audio/video the model returns.
+- **Data-URL + sticker support** — stickers and pasted images (base64 data URIs) classify and render correctly without needing a web URL.
+- **Reaction + markdown formatting preserved** — the parser splits by lines and only converts URLs it can classify as media; everything else stays as text with the existing bold/italic/underline rendering.
 
 ### v1.3 — April 11-12, 2026
 
