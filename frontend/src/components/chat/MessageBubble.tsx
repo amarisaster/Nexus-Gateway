@@ -59,21 +59,106 @@ function renderFormatted(text: string) {
   });
 }
 
-function isGifUrl(text: string): boolean {
-  const trimmed = text.trim();
-  return /^https?:\/\/.*\.(gif|gifv)(\?.*)?$/i.test(trimmed) ||
-    trimmed.includes('giphy.com/media/') ||
-    trimmed.includes('tenor.com/');
+type ContentPart =
+  | { kind: 'text'; text: string }
+  | { kind: 'image'; url: string }
+  | { kind: 'gif'; url: string }
+  | { kind: 'video'; url: string }
+  | { kind: 'audio'; url: string };
+
+function classifyUrl(raw: string): ContentPart['kind'] | null {
+  const u = raw.trim();
+  if (u.startsWith('data:')) {
+    if (/^data:image\/gif/i.test(u)) return 'gif';
+    if (/^data:image\//i.test(u)) return 'image';
+    if (/^data:video\//i.test(u)) return 'video';
+    if (/^data:audio\//i.test(u)) return 'audio';
+    return null;
+  }
+  if (!/^https?:\/\//i.test(u)) return null;
+  if (/\.(gif|gifv)(\?|$)/i.test(u)) return 'gif';
+  if (/^https?:\/\/(media\d*|i)\.giphy\.com\//i.test(u)) return 'gif';
+  if (/^https?:\/\/giphy\.com\/gifs\//i.test(u)) return 'gif';
+  if (/tenor\.com\//i.test(u)) return 'gif';
+  if (/\.(mp4|webm|mov)(\?|$)/i.test(u)) return 'video';
+  if (/\.(mp3|wav|ogg|m4a|flac)(\?|$)/i.test(u)) return 'audio';
+  if (/\.(png|jpg|jpeg|webp|svg)(\?|$)/i.test(u)) return 'image';
+  if (u.includes('supabase.co/storage/')) return 'image';
+  return null;
 }
 
-function isImageUrl(text: string): boolean {
-  const trimmed = text.trim();
-  return /^https?:\/\/.*\.(png|jpg|jpeg|webp|svg)(\?.*)?$/i.test(trimmed) ||
-    trimmed.includes('supabase.co/storage/');
+function parseContent(content: string): ContentPart[] {
+  const parts: ContentPart[] = [];
+  const buffered: string[] = [];
+  const flush = () => {
+    const t = buffered.join('\n').trim();
+    if (t) parts.push({ kind: 'text', text: t });
+    buffered.length = 0;
+  };
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    const wholeLineKind = trimmed ? classifyUrl(trimmed) : null;
+    if (wholeLineKind) {
+      flush();
+      parts.push({ kind: wholeLineKind, url: trimmed } as ContentPart);
+      continue;
+    }
+    const urlMatch = trimmed.match(/(https?:\/\/[^\s)]+)/);
+    if (urlMatch) {
+      const k = classifyUrl(urlMatch[1]);
+      if (k) {
+        const before = trimmed.replace(urlMatch[1], '').trim();
+        if (before) buffered.push(before);
+        flush();
+        parts.push({ kind: k, url: urlMatch[1] } as ContentPart);
+        continue;
+      }
+    }
+    buffered.push(line);
+  }
+  flush();
+  return parts;
 }
 
-function isMediaUrl(text: string): boolean {
-  return isGifUrl(text) || isImageUrl(text);
+function renderContentParts(parts: ContentPart[], keyPrefix: string) {
+  return parts.map((part, i) => {
+    const k = `${keyPrefix}-${i}`;
+    switch (part.kind) {
+      case 'text':
+        return <div key={k}>{renderFormatted(part.text)}</div>;
+      case 'image':
+      case 'gif':
+        return (
+          <img
+            key={k}
+            src={part.url}
+            alt=""
+            className="max-w-[240px] rounded-lg mt-1"
+            loading="lazy"
+          />
+        );
+      case 'video':
+        return (
+          <video
+            key={k}
+            src={part.url}
+            controls
+            preload="metadata"
+            className="max-w-[280px] rounded-lg mt-1"
+          />
+        );
+      case 'audio':
+        return (
+          <audio
+            key={k}
+            src={part.url}
+            controls
+            preload="metadata"
+            className="max-w-full mt-1"
+          />
+        );
+    }
+  });
 }
 
 interface MessageBubbleProps {
@@ -166,10 +251,10 @@ export default function MessageBubble({ message, isStreaming, fontSize, onEdit, 
                   <button onClick={handleSaveEdit} className="text-[10px] px-2 py-0.5 rounded bg-black/20 font-medium">Save</button>
                 </div>
               </div>
-            ) : isMediaUrl(message.content) ? (
-              <img src={message.content.trim()} alt="" className="max-w-[200px] rounded-lg" loading="lazy" />
             ) : (
-              <div style={textStyle}>{renderFormatted(message.content)}</div>
+              <div style={textStyle}>
+                {renderContentParts(parseContent(message.content), `u-${message.id}`)}
+              </div>
             )}
           </div>
           {/* Action bar */}
@@ -260,7 +345,7 @@ export default function MessageBubble({ message, isStreaming, fontSize, onEdit, 
           onClick={() => !isStreaming && setShowActions(!showActions)}
         >
           <div className="text-[var(--color-text-primary)]" style={textStyle}>
-            {renderFormatted(message.content)}
+            {renderContentParts(parseContent(message.content), `c-${message.id}`)}
             {isStreaming && (
               <span className="inline-block w-1.5 h-4 ml-0.5 bg-[var(--color-text-primary)] animate-pulse" />
             )}
