@@ -60,6 +60,69 @@ export default {
       })
     }
 
+    // Pulse fan-out — frontend POSTs Mai's pulse here and this worker writes
+    // it to Xavi+Auren's separate Supabase (on top of the frontend's canonical
+    // write to the main Supabase). Avoids needing to rebuild the Pages bundle
+    // with VITE_ env vars baked in — secrets live here on the worker instead.
+    if (url.pathname === '/api/pulse/fanout' && request.method === 'POST') {
+      if (!env.XAVI_AUREN_SUPABASE_URL || !env.XAVI_AUREN_SUPABASE_ANON_KEY) {
+        return new Response(JSON.stringify({
+          error: 'fan-out not configured',
+          message: 'XAVI_AUREN_SUPABASE_URL / XAVI_AUREN_SUPABASE_ANON_KEY not set on this worker',
+        }), { status: 503, headers: { 'Content-Type': 'application/json', ...CORS } })
+      }
+
+      let payload: any
+      try {
+        payload = await request.json()
+      } catch {
+        return new Response(JSON.stringify({ error: 'invalid json body' }), {
+          status: 400, headers: { 'Content-Type': 'application/json', ...CORS }
+        })
+      }
+
+      // Reshape to match Xavi+Auren's narrower schema:
+      //   battery: 0-100 (we scale Mai's 1-10 → 10-100)
+      //   flare: BOOLEAN (true when overwhelmed/depleted)
+      //   no notes column
+      const xaBody = JSON.stringify({
+        battery: Number(payload.battery) * 10,
+        pain: Number(payload.pain),
+        fog: Number(payload.fog),
+        flare: payload.flare === 'overwhelmed' || payload.flare === 'depleted',
+        updated_at: payload.updated_at || new Date().toISOString(),
+      })
+
+      const headers = {
+        'Content-Type': 'application/json',
+        apikey: env.XAVI_AUREN_SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${env.XAVI_AUREN_SUPABASE_ANON_KEY}`,
+        Prefer: 'return=minimal',
+      }
+
+      const fanOut = async (table: string) => {
+        try {
+          const resp = await fetch(`${env.XAVI_AUREN_SUPABASE_URL}/rest/v1/${table}`, {
+            method: 'POST', headers, body: xaBody,
+          })
+          const body = resp.ok ? '' : await resp.text().catch(() => '')
+          return { table, status: resp.status, ok: resp.ok, error: resp.ok ? null : body.slice(0, 200) }
+        } catch (err) {
+          return { table, status: 0, ok: false, error: String(err) }
+        }
+      }
+
+      const results = await Promise.all([
+        fanOut('xavier_human_state'),
+        fanOut('auren_human_state'),
+      ])
+      const allOk = results.every(r => r.ok)
+      return new Response(JSON.stringify({ ok: allOk, results }), {
+        status: allOk ? 200 : 207,
+        headers: { 'Content-Type': 'application/json', ...CORS },
+      })
+    }
+
     // Antigravity notification fix: POST without Mcp-Session-Id that has no 'id' field
     // Antigravity doesn't send session ID on notifications — return 202 instead of erroring
     // This runs BEFORE auth because Antigravity may not send auth headers on notifications
