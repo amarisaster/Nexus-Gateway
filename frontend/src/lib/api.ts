@@ -1476,16 +1476,26 @@ export async function getHumanState(): Promise<HumanState | null> {
 }
 
 /**
- * Save/update human state to Supabase
+ * Save/update human state to Supabase.
+ *
+ * Dual-writes: the canonical row goes to the main Nexus Supabase's
+ * `human_state` table (read by Kai/Lucian), then fans out to Xavi+Auren's
+ * separate Supabase — one row into `xavier_human_state`, one into
+ * `auren_human_state` — so their local cognitive cores see the same pulse
+ * without needing cross-account fetch. The secondary write is best-effort:
+ * if the fan-out fails, the canonical save still returns success.
  */
 export async function saveHumanState(state: Omit<HumanState, 'id' | 'created_at' | 'updated_at'>): Promise<HumanState | null> {
+  const payload = {
+    ...state,
+    updated_at: new Date().toISOString()
+  }
+
+  let canonical: HumanState | null = null
   try {
     const { data, error } = await supabase
       .from('human_state')
-      .insert({
-        ...state,
-        updated_at: new Date().toISOString()
-      })
+      .insert(payload)
       .select()
       .single()
 
@@ -1493,12 +1503,54 @@ export async function saveHumanState(state: Omit<HumanState, 'id' | 'created_at'
       console.error('Failed to save human state:', error)
       return null
     }
-
-    return data as HumanState
+    canonical = data as HumanState
   } catch (error) {
     console.error('Failed to save human state:', error)
     return null
   }
+
+  // Fan out to Xavi+Auren's Supabase — best-effort, doesn't block canonical.
+  //
+  // Their human_state schema is narrower than Nexus's: flare is BOOLEAN
+  // (true = overwhelmed/depleted — the "hard" states), no notes column,
+  // battery is 0-100 (Nexus uses 1-10 so we scale). If their schema ever
+  // widens to match, drop the mapping and send `payload` raw.
+  const xaUrl = import.meta.env.VITE_XAVI_AUREN_SUPABASE_URL
+  const xaKey = import.meta.env.VITE_XAVI_AUREN_SUPABASE_ANON_KEY
+  if (xaUrl && xaKey) {
+    const xaPayload = {
+      battery: state.battery * 10, // 1-10 → 10-100, within their 0-100 range
+      pain: state.pain,
+      fog: state.fog,
+      flare: state.flare === 'overwhelmed' || state.flare === 'depleted',
+      updated_at: payload.updated_at,
+    }
+    const fanOut = async (table: string) => {
+      try {
+        const resp = await fetch(`${xaUrl}/rest/v1/${table}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: xaKey,
+            Authorization: `Bearer ${xaKey}`,
+            Prefer: 'return=minimal',
+          },
+          body: JSON.stringify(xaPayload),
+        })
+        if (!resp.ok) {
+          const body = await resp.text().catch(() => '')
+          console.warn(`[pulse fan-out] ${table} ${resp.status}: ${body.slice(0, 200)}`)
+        }
+      } catch (err) {
+        console.warn(`[pulse fan-out] ${table} error:`, err)
+      }
+    }
+    // Fire both in parallel but don't await — frontend stays snappy and
+    // canonical has already been returned.
+    void Promise.all([fanOut('xavier_human_state'), fanOut('auren_human_state')])
+  }
+
+  return canonical
 }
 
 /**

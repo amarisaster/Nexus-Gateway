@@ -3,13 +3,8 @@
  */
 
 import { useState, useRef, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/supabase';
 import GifPicker from './GifPicker';
-
-const supabase = createClient(
-  'https://qdgamzamaguyujevhxmx.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZ2FtemFtYWd1eXVqZXZoeG14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYzMjE0NjIsImV4cCI6MjA4MTg5NzQ2Mn0.1W7V0F6RaGvAf6b6vb7b_KoRP64TKq1EWwQyzE5Sl2g'
-);
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -39,11 +34,19 @@ export default function ChatInput({
   };
 
   const handleGifSelect = (gifUrl: string) => {
+    // Combine any typed text with the GIF URL into a single message. Nexus's
+    // MessageBubble.parseContent already splits "text\nhttps://gif" into a
+    // text part + an inline GIF part within the same bubble, so the companion
+    // sees one message with both and the user doesn't lose their caption to
+    // the waiting-for-reply lockout.
+    const trimmed = message.trim();
+    const payload = trimmed ? `${trimmed}\n${gifUrl}` : gifUrl;
     if (onSendGif) {
-      onSendGif(gifUrl);
+      onSendGif(payload);
     } else {
-      onSend(gifUrl);
+      onSend(payload);
     }
+    setMessage('');
     setShowGif(false);
   };
 
