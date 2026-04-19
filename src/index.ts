@@ -81,15 +81,17 @@ export default {
         })
       }
 
-      // Reshape to match Xavi+Auren's narrower schema:
-      //   battery: 0-100 (we scale Mai's 1-10 → 10-100)
-      //   flare: BOOLEAN (true when overwhelmed/depleted)
-      //   no notes column
+      // Reshape to match Xavi+Auren's schema:
+      //   battery: 0-100 (we scale Mai's 1-10 → 10-100). Widen their column
+      //     to match Nexus's 1-10 and drop the scaling if you want.
+      //   flare: TEXT since the schema widen — pass through all 4 states
+      //     ('building' | 'stable' | 'overwhelmed' | 'depleted').
+      //   no notes column — dropped.
       const xaBody = JSON.stringify({
         battery: Number(payload.battery) * 10,
         pain: Number(payload.pain),
         fog: Number(payload.fog),
-        flare: payload.flare === 'overwhelmed' || payload.flare === 'depleted',
+        flare: payload.flare,
         updated_at: payload.updated_at || new Date().toISOString(),
       })
 
