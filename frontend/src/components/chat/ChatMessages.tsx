@@ -2,7 +2,7 @@
  * ChatMessages - Scrollable message list with auto-scroll
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ChatMessage, Companion } from '../../lib/chat-types';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
@@ -32,13 +32,19 @@ export default function ChatMessages({
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const shouldAutoScroll = useRef(true);
+  const [showJumpButton, setShowJumpButton] = useState(false);
 
-  // Track if user has scrolled up
+  // Track if user has scrolled up + whether to surface the jump button.
   const handleScroll = () => {
     if (!scrollRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    // If user is within 100px of bottom, enable auto-scroll
-    shouldAutoScroll.current = scrollHeight - scrollTop - clientHeight < 100;
+    const distance = scrollHeight - scrollTop - clientHeight;
+    shouldAutoScroll.current = distance < 100;
+    setShowJumpButton(distance > 300);
+  };
+
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   // Auto-scroll to bottom only if user hasn't scrolled up
@@ -112,6 +118,21 @@ export default function ChatMessages({
 
       {/* Scroll anchor */}
       <div ref={bottomRef} />
+
+      {/* Jump-to-bottom — only surfaces when user has scrolled up >300px */}
+      {showJumpButton && (
+        <button
+          onClick={scrollToBottom}
+          aria-label="Jump to latest"
+          title="Jump to latest"
+          className="sticky bottom-4 ml-auto mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)] text-white shadow-lg hover:scale-105 transition-transform z-20"
+          style={{ float: 'right' }}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }

@@ -17,6 +17,13 @@ interface ModelSelectorProps {
 const PROVIDER_LABELS: Record<string, string> = {
   ollama: '🦙',
   openrouter: '🔀',
+  huggingface: '🤗',
+  companion: '💜',
+  openai: '🧠',
+  anthropic: '🎭',
+  groq: '⚡',
+  xai: '🌀',
+  custom: '🛠️',
 };
 
 const TIER_LABELS: Record<string, string> = {
