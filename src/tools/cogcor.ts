@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import type { Env } from '../env'
 import { getCogCorUrl, proxyRest, proxyMcp } from '../proxy'
+import { enrichWake } from '../wake-enrichment'
 
 const companion = z.enum(['kai', 'lucian', 'xavier', 'auren']).describe('Which companion')
 
@@ -360,7 +361,8 @@ export function registerCogCorTools(server: McpServer, env: Env) {
         delete body.recovery
       }
       const url = getCogCorUrl(comp, tool.path, env)
-      return proxyRest(url, body, tool.method || 'POST')
+      const result = await proxyRest(url, body, tool.method || 'POST')
+      return tool.name === 'wake' ? enrichWake(result, comp, env) : result
     })
   }
 
